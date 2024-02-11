@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface JobService {
     public GenericResponse<JobDTO> postJob(JobDTO job, long userId);
-    public GenericResponse<List<JobDTO>> fetchTopTenJobs(SortBy condition);
+    public GenericResponse<List<JobDTO>> fetchTopTenJobs(String condition);
     public GenericResponse<JobDTO> placeBid(BidDTO bidDTO, long jobId, long bidderId);
 
     public GenericResponse<JobDTO> getJob(long jobId);

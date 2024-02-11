@@ -4,6 +4,7 @@ import com.craft.demo.models.dtos.GenericResponse;
 import com.craft.demo.models.dtos.UserDTO;
 import com.craft.demo.models.enitities.User;
 import com.craft.demo.repositories.CustomORM;
+import com.craft.demo.utils.CraftConstants;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +23,10 @@ public class UserServiceImpl implements UserService {
         try {
             logger.info("UserServiceImpl.registerUser => method called with user : {}", userDTO);
             User savedUser = CustomORM.saveUser(modelMapper.map(userDTO, User.class));
-            return new GenericResponse<>(HttpStatus.CREATED, modelMapper.map(savedUser, UserDTO.class), "Success");
+            return new GenericResponse<>(HttpStatus.CREATED, modelMapper.map(savedUser, UserDTO.class), CraftConstants.SUCCESS_MESSAGE);
         } catch (Exception e) {
-            logger.error("UserServiceImpl.registerUser => exception occurred", e);
-            return new GenericResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, null, "Failure");
+            logger.error("UserServiceImpl.registerUser => " + CraftConstants.EXCEPTION_OCCURRED_MESSAGE, e);
+            return new GenericResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, null, CraftConstants.FAILURE_MESSAGE);
         }
     }
 
@@ -35,13 +36,13 @@ public class UserServiceImpl implements UserService {
             logger.info("UserServiceImpl.loginUser => method called with user: {}", userDTO);
             User savedUser = CustomORM.findUserByUsernameAndPassword(userDTO.getUsername(), userDTO.getPassword());
             if(savedUser == null){
-                logger.info("UserServiceImpl.loginUser => Incorrect password or username !!", userDTO);
-                return new GenericResponse<>(HttpStatus.UNAUTHORIZED, null, "Incorrect username or password!!");
+                logger.info("UserServiceImpl.loginUser => " + CraftConstants.INCORRECT_USERNAME_OR_PASSWORD_MESSAGE, userDTO);
+                return new GenericResponse<>(HttpStatus.UNAUTHORIZED, null, CraftConstants.INCORRECT_USERNAME_OR_PASSWORD_MESSAGE);
             }
-            return new GenericResponse<>(HttpStatus.OK, modelMapper.map(savedUser, UserDTO.class), "Success");
+            return new GenericResponse<>(HttpStatus.OK, modelMapper.map(savedUser, UserDTO.class), CraftConstants.SUCCESS_MESSAGE);
         } catch(Exception e) {
-            logger.error("UserServiceImpl.loginUser => exception occurred", e);
-            return new GenericResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, null, "Failure");
+            logger.error("UserServiceImpl.loginUser => " + CraftConstants.EXCEPTION_OCCURRED_MESSAGE, e);
+            return new GenericResponse<>(HttpStatus.INTERNAL_SERVER_ERROR, null,  CraftConstants.FAILURE_MESSAGE);
         }
     }
 }

@@ -35,8 +35,7 @@ public class JobController {
 
     @GetMapping("/fetchTop10Jobs")
     public ResponseEntity<GenericResponse> fetchTopTenJobs(@RequestParam String sortCondition) {
-        SortBy sortBy = SortBy.valueOf(sortCondition);
-        GenericResponse<List<JobDTO>> response = jobService.fetchTopTenJobs(sortBy);
+        GenericResponse<List<JobDTO>> response = jobService.fetchTopTenJobs(sortCondition);
         return new ResponseEntity<>(response, response.getStatus());
     }
 

@@ -37,7 +37,7 @@ public class CustomORM {
     }
 
     public static User findUserById(long userId) throws ResourceNotFoundException {
-        return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException());
+        return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found with given Id !!"));
     }
     
     public static User findUserByUsernameAndPassword(String username, String password) {
@@ -50,7 +50,7 @@ public class CustomORM {
     }
     
     public static Job findJobById(long jobId) throws ResourceNotFoundException {
-        return jobRepository.findById(jobId).orElseThrow(() -> new ResourceNotFoundException());
+        return jobRepository.findById(jobId).orElseThrow(() -> new ResourceNotFoundException("Job not found with given Id !!"));
     }
     
     public static Bid saveBid(Bid bid) {
