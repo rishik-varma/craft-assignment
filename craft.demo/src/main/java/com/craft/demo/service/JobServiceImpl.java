@@ -1,9 +1,6 @@
 package com.craft.demo.service;
 
-import com.craft.demo.models.dtos.GenericResponse;
-import com.craft.demo.models.dtos.BidDTO;
-import com.craft.demo.models.dtos.JobDTO;
-import com.craft.demo.models.dtos.UserDTO;
+import com.craft.demo.models.dtos.*;
 import com.craft.demo.models.enitities.Bid;
 import com.craft.demo.models.enitities.Job;
 import com.craft.demo.models.enitities.User;
@@ -13,6 +10,7 @@ import com.craft.demo.models.exceptions.ResourceNotFoundException;
 import com.craft.demo.models.exceptions.SortConditionNotSupportedException;
 import com.craft.demo.repositories.CustomORM;
 import com.craft.demo.utils.CraftConstants;
+import com.google.gson.Gson;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +33,9 @@ public class JobServiceImpl implements JobService {
     private static final Logger logger = LoggerFactory.getLogger(JobServiceImpl.class);
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private SseService sseService;
 
     @Override
     public GenericResponse<JobDTO> postJob(JobDTO jobDTO, long userId) {
@@ -137,6 +139,11 @@ public class JobServiceImpl implements JobService {
             Job jobToSave = modelMapper.map(jobDTO, Job.class);
 
             Job savedJob = CustomORM.saveJob(jobToSave);
+            JobDTO savedJobDTO = modelMapper.map(savedJob, JobDTO.class);
+            BidDTO winningBid = savedJobDTO.getBids().stream().min(Comparator.comparing(BidDTO::getBiddingAmount)).get();
+            Gson gson = new Gson();
+            sseService.sendEvent(gson.toJson(new JobEventDTO(savedJobDTO.getNumberOfBids(), winningBid.getBidder().getUsername(), winningBid.getBiddingAmount())), savedJobDTO.getId());
+
             return new GenericResponse<>(HttpStatus.CREATED, modelMapper.map(savedJob, JobDTO.class), CraftConstants.SUCCESS_MESSAGE);
         } catch (ResourceNotFoundException e) {
             logger.error("JobServiceImpl.placeBid => " + e.getMessage());
